@@ -20,11 +20,11 @@ def sendPrivateMessage(server, client, user_id, message):
     server.send_message(client, msg)
 
 # 发送群消息
-def sendGroupMessage(server, client, user_id, message):
+def sendGroupMessage(server, client, group_id, message):
     msg=JSON.dumps({
         "action": "send_group_msg",
         "params": {
-            "user_id": user_id,
+            "group_id": group_id,
             "message": message
         }
     })
@@ -67,6 +67,11 @@ def message_received(client, server, message):
         elif data["message"]=="get":
             # sendPrivateMessage(server, client, data["sender"]["user_id"], 要发送的内容)
             sendPrivateMessage(server, client, data["sender"]["user_id"], "meow~")
+    elif data["message_type"]=="group":
+        if re.match("\\d{63}", data["message"]):
+            sendGroupMessage(server, client, data["group_id"], "正在获取...请等待大约10秒钟...")
+            msg="获取成功\n"+buildID(getRetActivateCID(data["message"]),7,7)
+            sendGroupMessage(server, client, data["group_id"], msg)
 
 server = WebsocketServer(1149, host='127.0.0.1')
 # server.set_fn_new_client(new_client)
